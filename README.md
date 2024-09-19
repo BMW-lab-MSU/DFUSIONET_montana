@@ -6,7 +6,7 @@ This repository contains a MATLAB script for predicting irrigation requirements 
 ## Table of Contents
 - [Usage](#usage)
 - [User Inputs](#user-inputs)
-- [Script Workflow](#Script Workflow)
+- [Script Workflow](#script-workflow)
 - [Dependencies](#dependencies)
 - [Publication](#Publication)
 - [Contact](#contact)
@@ -34,21 +34,63 @@ This repository contains a MATLAB script for predicting irrigation requirements 
 - `NN_param`: Parameters for the neural network (batch size, learning rate, dropout probability, epochs).
 
 ## Script Workflow
-### POI_preprocessing.m 
-input and details: all arable sensor and spatial data
-output: merged sensor data table, merged spatial data table, intersection dates when both sensor and spatial data available (ETdata_POI_input.mat)
+
+This repository includes MATLAB scripts for processing sensor and spatial data to estimate evapotranspiration (ET) and generate machine learning datasets. Below is an overview of each script and its workflow.
+
+### POI_preprocessing.m
+- **Input**: 
+  - Arable sensor data
+  - Spatial data
+- **Details**:
+  - Merges sensor and spatial data.
+  - Identifies intersection dates when both sensor and spatial data are available.
+- **Output**: 
+  - `merged_sensor_data_table`
+  - `merged_spatial_data_table`
+  - Intersection dates (`ETdata_POI_input.mat`)
+
 ### ET_POI.m
-input and details: takes the output of POI_preprocessing.m (ETdata_POI_input.mat), selects which specific Arable sensor to use as reference, performs interpolation to find daily spatial ET, throws outliers.
-output: daily reference sensor's ETc, daily spatial data table, date of satellite imagery (ET_interpolated.mat)
+- **Input**: 
+  - Output from `POI_preprocessing.m` (`ETdata_POI_input.mat`)
+- **Details**: 
+  - Selects a specific Arable sensor as a reference.
+  - Performs interpolation to compute daily spatial ET.
+  - Detects and removes outliers.
+- **Output**: 
+  - Daily ETc from the reference sensor.
+  - Daily spatial data table.
+  - Satellite imagery dates (`ET_interpolated.mat`)
+
 ### ET_ML_dataset_generation.m
-input and details: takes the output of ET_POI.m (ET_interpolated.mat), prepares the dataset for temporal partition by slicing and merging (in a very specific order) the daily sensor data timeseries and ET timeseries for each pixel individually.
-output: Xdata, Ydata (train-test unseparated), date of satellite imagery, all dates of the season, misc. (ET_ML_dataset.mat)
+- **Input**: 
+  - Output from `ET_POI.m` (`ET_interpolated.mat`)
+- **Details**: 
+  - Prepares the dataset for machine learning by merging and slicing daily sensor data and ET timeseries for each pixel.
+- **Output**: 
+  - `Xdata` and `Ydata` (combined training and testing sets)
+  - Satellite imagery dates
+  - All dates of the season
+  - Miscellaneous (`ET_ML_dataset.mat`)
+
 ### ET_ML_temporalpartition.m
-input and details: takes the output of ET_ML_dataset_generation.m (ET_ML_dataset.mat), calls the function ETtemporalpartitiondataset.m split train-test data and merges all pixels together in a very specific order.
-output: 4 files containing training data and testing data (in datastore format).
+- **Input**: 
+  - Output from `ET_ML_dataset_generation.m` (`ET_ML_dataset.mat`)
+- **Details**: 
+  - Calls `ETtemporalpartitiondataset.m` to split the dataset into training and testing sets, merging pixels in a specific order.
+- **Output**: 
+  - Four files containing training and testing data in datastore format.
+
 ### main_ET_pred_1step.m
-input and details: takes the output of ET_ML_temporalpartition.m (2 train and 2 test files), calls the training (ET_pred_1step_train.m) and testing (ET_pred_1step_test_kd_box.m) functions for a fixed rng (for reproducibility).
-output: prediction RMSE (both test and train), compare against a baseline model (LOCF: Last Observation Carried Forward). Kernel density distribution and box plot.
+- **Input**: 
+  - Output from `ET_ML_temporalpartition.m` (2 training files, 2 testing files)
+- **Details**: 
+  - Calls the training script (`ET_pred_1step_train.m`) and testing script (`ET_pred_1step_test_kd_box.m`) using a fixed random number generator for reproducibility.
+- **Output**: 
+  - Prediction RMSE (for both training and testing sets)
+  - Comparison against a baseline model (Last Observation Carried Forward, LOCF)
+  - Kernel density distribution and box plot for model evaluation
+
+
 ## Dependencies
 - MATLAB R2021b or later
 - Deep Learning Toolbox
