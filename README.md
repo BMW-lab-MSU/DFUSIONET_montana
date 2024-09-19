@@ -45,8 +45,8 @@ This repository includes MATLAB scripts for processing sensor and spatial data t
   - Merges sensor and spatial data.
   - Identifies intersection dates when both sensor and spatial data are available.
 - **Output**: 
-  - `merged_sensor_data_table`
-  - `merged_spatial_data_table`
+  - A collection of all tables, each containing a particular sensor data for a specific range of dates.
+  - A collection of all tables, each containing spatial data for a specific set of dates (when satellite data was available).
   - Intersection dates (`ETdata_POI_input.mat`)
 
 ### ET_POI.m
@@ -58,7 +58,7 @@ This repository includes MATLAB scripts for processing sensor and spatial data t
   - Detects and removes outliers.
 - **Output**: 
   - Daily ETc from the reference sensor.
-  - Daily spatial data table.
+  - Daily spatial data table for a specific range of dates (same as the daily ETc).
   - Satellite imagery dates (`ET_interpolated.mat`)
 
 ### ET_ML_dataset_generation.m
