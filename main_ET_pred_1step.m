@@ -21,7 +21,7 @@ load(fullfile(mydir,filename_othertestdata))
 
 %% NN selected architecure
 % this is a "fixed" architecture 
-xval = [100; 300; 400]; % row 1 = sensor; row 2 = ET; row 3 = combined; %%%%%%%%%%% best so far is [600;45;43]
+xval = [100; 300; 400]; % row 1 = sensor; row 2 = ET; row 3 = combined; %%%%%%%%%%% best so far is [100;300;400]
 
 % rng parameters
 t = rng(10); % set your rng number
