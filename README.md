@@ -99,6 +99,8 @@ For detailed documentation, please read the paper (and cite when necessary)
 
 F. N. Shimim et al., "Integrating Satellite Imagery and Infield Sensors for Daily Spatial Plant Evapotranspiration Prediction: A Machine Learning-Driven Approach," 2024 Intermountain Engineering, Technology and Computing (IETC), Logan, UT, USA, 2024, pp. 162-167, doi: 10.1109/IETC61393.2024.10564271.
 
+URL: https://ieeexplore.ieee.org/abstract/document/10564271 
+
 ## Contact
 
 For any questions or issues, please contact Farshina at farshin.nazrulshimim@student.montana.edu
