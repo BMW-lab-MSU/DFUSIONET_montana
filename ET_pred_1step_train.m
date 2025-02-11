@@ -22,7 +22,9 @@ nLabels{end+1} = strcat('layers_ET_in' , '_', string(numFeatures(1,2)) );
 l_prev_S = "layers_S_in";
 l_prev_ET = "layers_ET_in";
 for i = 1:length(numHiddenUnits(1,:))
-    % row 1 = sensor; row 2 = ET; row 3 = combined; 
+ % row 1 = sensor; row 2 = ET; row 3 = combined;
+
+    % Sensor network layers
     if numHiddenUnits(1,i)> 0
         layername_S = "layers_S_hidden" + string(i);
         lgraph = addLayers(lgraph,fullyConnectedLayer(numHiddenUnits(1,i),"Name",layername_S));
@@ -32,7 +34,7 @@ for i = 1:length(numHiddenUnits(1,:))
 
         % add batchNormalizationLayer
         layername_S = "bnlayer_S" + string(i);
-        lgraph = addLayers(lgraph,reluLayer("Name",layername_S));
+        lgraph = addLayers(lgraph,batchNormalizationLayer("Name",layername_S));
         lgraph = connectLayers(lgraph,l_prev_S,layername_S);
         nLabels{end+1} = strcat(layername_S , '_', string(numHiddenUnits(1,i)));
         l_prev_S = layername_S;
@@ -43,7 +45,16 @@ for i = 1:length(numHiddenUnits(1,:))
         lgraph = connectLayers(lgraph,l_prev_S,layername_S);
         nLabels{end+1} = strcat(layername_S , '_', string(numHiddenUnits(1,i)));
         l_prev_S = layername_S;
+
+        % add dropoutlayer
+        layername_S = "dropoutLayer_S" + string(i);
+        lgraph = addLayers(lgraph,dropoutLayer(dropout_prob,"Name",layername_S));
+        lgraph = connectLayers(lgraph,l_prev_S,layername_S);
+        nLabels{end+1} = strcat(layername_S , '_', string(dropout_prob));
+        l_prev_S = layername_S;
     end
+
+    % ET network layers
     if numHiddenUnits(2,i)> 0
         layername_ET = "layers_ET_hidden" + string(i);
         lgraph = addLayers(lgraph,fullyConnectedLayer(numHiddenUnits(2,i),"Name",layername_ET));
@@ -53,7 +64,7 @@ for i = 1:length(numHiddenUnits(1,:))
 
         % add batchNormalizationLayer
         layername_ET = "bnLayer_ET" + string(i);
-        lgraph = addLayers(lgraph,reluLayer("Name",layername_ET));
+        lgraph = addLayers(lgraph,batchNormalizationLayer("Name",layername_ET));
         lgraph = connectLayers(lgraph,l_prev_ET,layername_ET);
         nLabels{end+1} = strcat(layername_ET , '_', string(numHiddenUnits(2,i)));
         l_prev_ET = layername_ET;
@@ -64,21 +75,12 @@ for i = 1:length(numHiddenUnits(1,:))
         lgraph = connectLayers(lgraph,l_prev_ET,layername_ET);
         nLabels{end+1} = strcat(layername_ET , '_', string(numHiddenUnits(2,i)));
         l_prev_ET = layername_ET;
-    end
-    % append dropout if not the last layer
-    if i < length(numHiddenUnits(1,:))        % need to double check this condition, looks like the underlying assumption is numHiddenUnits will always have equal number of elements (and they are all non-zeros) in all of the rows
-        
-        % add dropoutlayer
-        layername_S = "dropoutLayer_S" + string(i);
-        lgraph = addLayers(lgraph,dropoutLayer(dropput_prob,"Name",layername_S));
-        lgraph = connectLayers(lgraph,l_prev_S,layername_S);
-        nLabels{end+1} = strcat(layername_S , '_', string(dropput_prob));
-        l_prev_S = layername_S;
 
+        % add dropoutlayer
         layername_ET = "dropoutLayer_ET" + string(i);
-        lgraph = addLayers(lgraph,dropoutLayer(dropput_prob,"Name",layername_ET));
+        lgraph = addLayers(lgraph,dropoutLayer(dropout_prob,"Name",layername_ET));
         lgraph = connectLayers(lgraph,l_prev_ET,layername_ET);
-        nLabels{end+1} = strcat(layername_ET , '_', string(dropput_prob));
+        nLabels{end+1} = strcat(layername_ET , '_', string(dropout_prob));
         l_prev_ET = layername_ET;
     end
 end
@@ -94,7 +96,7 @@ nLabels{end+1} = strcat(concat.Name);
 l_prev = concat.Name;
 
 for i = 1:length(numHiddenUnits(3,:))
-    if numHiddenUnits(3,i)> 0
+       if numHiddenUnits(3,i)> 0
         layername = "layers_hidden" + string(i);
         lgraph = addLayers(lgraph,fullyConnectedLayer(numHiddenUnits(3,i),"Name",layername));
         lgraph = connectLayers(lgraph,l_prev,layername);
@@ -103,7 +105,7 @@ for i = 1:length(numHiddenUnits(3,:))
 
         % add batchNormalizationLayer
         layername = "bnLayer" + string(i);
-        lgraph = addLayers(lgraph,reluLayer("Name",layername));
+        lgraph = addLayers(lgraph,batchNormalizationLayer("Name",layername));
         lgraph = connectLayers(lgraph,l_prev,layername);
         nLabels{end+1} = strcat(layername , '_', string(numHiddenUnits(3,i)));
         l_prev = layername;
@@ -114,16 +116,15 @@ for i = 1:length(numHiddenUnits(3,:))
         lgraph = connectLayers(lgraph,l_prev,layername);
         nLabels{end+1} = strcat(layername , '_', string(numHiddenUnits(3,i)));
         l_prev = layername;
-    end
-    % append dropout if not the last layer
-    if i < length(numHiddenUnits(3,:))
+
         % add dropoutlayer
         layername = "dropoutLayer" + string(i);
-        lgraph = addLayers(lgraph,dropoutLayer(dropput_prob,"Name",layername));
+        lgraph = addLayers(lgraph,dropoutLayer(dropout_prob,"Name",layername));
         lgraph = connectLayers(lgraph,l_prev,layername);
-        nLabels{end+1} = strcat(layername , '_', string(dropput_prob));
+        nLabels{end+1} = strcat(layername , '_', string(dropout_prob));
         l_prev = layername;
     end
+
 end
 
 layername = "outputLayer";
